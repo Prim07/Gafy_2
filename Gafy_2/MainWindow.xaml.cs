@@ -20,6 +20,12 @@ namespace Gafy_2
     /// </summary>
     public partial class MainWindow : Window
     {
+
+
+        private AdjacencyMatrix adjacencyMatrix;
+
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -94,6 +100,28 @@ namespace Gafy_2
             else
             {
                 Sequence.Background = Brushes.OrangeRed;
+            }
+        }
+
+
+
+
+        //Tutaj rysujemy graf losowy o zadanych stopniach wierzcholkow
+        private void Button_Click1(object sender, RoutedEventArgs e)
+        {
+            if (Dagrees.Text != "0")
+            {
+                Dagrees.Background = Brushes.White;
+                string FromTheBox = Dagrees.Text;
+                string[] SeparetedFromTheBox = FromTheBox.Split(',');
+                int[] TabOfInt = Array.ConvertAll(SeparetedFromTheBox, i => int.Parse(i));
+                Array.Sort(TabOfInt);
+                AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(TabOfInt.Length);
+                adjacencyMatrix.Display(MyCanvas, TabOfInt);
+            }
+            else
+            {
+                Dagrees.Background = Brushes.OrangeRed;
             }
         }
     }
