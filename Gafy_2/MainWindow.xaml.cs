@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -124,5 +125,163 @@ namespace Gafy_2
                 Dagrees.Background = Brushes.OrangeRed;
             }
         }
+
+
+
+
+
+        //Tutaj rysujemy graf losowy o zadanych stopniach wierzcholkow
+        private void Button_Click2(object sender, RoutedEventArgs e)
+        {
+            if (Vertexes.Text == "")
+            {
+                Vertexes.Background = Brushes.OrangeRed;
+            }
+            else if (Edges.Text == "")
+            {
+                Vertexes.Background = Brushes.White;
+                Edges.Background = Brushes.OrangeRed;
+            }
+            else if ((Int32.Parse(Edges.Text) * Int32.Parse(Edges.Text) - Int32.Parse(Edges.Text)) / 2 <= Int32.Parse(Vertexes.Text))
+            {
+                Vertexes.Background = Brushes.White;
+                Edges.Background = Brushes.White;
+
+                var num_of_v = Int32.Parse(Vertexes.Text);
+                var num_of_e = Int32.Parse(Edges.Text);
+
+                AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(num_of_v);
+
+                for (int i = 0; i < num_of_v; i++)
+                {
+                    for (int j = i + 1; j < num_of_v; j++)
+                    {
+                        adjacencyMatrix.AdjacencyArray[i, j] = 0;
+                        adjacencyMatrix.AdjacencyArray[j, i] = 0;
+                    }
+                }
+
+                int counter = 0;
+
+                Random r = new Random();
+
+                while (counter < num_of_e)
+                {
+                    int vertexToBeAdded_row = r.Next(0, num_of_v);
+                    int vertexToBeAdded_col = r.Next(0, num_of_v);
+                    if (adjacencyMatrix.AdjacencyArray[vertexToBeAdded_row, vertexToBeAdded_col] == 0 && vertexToBeAdded_row != vertexToBeAdded_col)
+                    {
+                        adjacencyMatrix.AdjacencyArray[vertexToBeAdded_row, vertexToBeAdded_col] = 1;
+                        adjacencyMatrix.AdjacencyArray[vertexToBeAdded_col, vertexToBeAdded_row] = 1;
+                        counter++;
+                    }
+
+                }
+
+                //sprawdzanie!!!!!!
+                //////////////////////////////
+
+                int v = num_of_v;
+
+                const int INF = 207;
+                int n, m, a, b, ile_skladowych, max_sklad, ta_sklad, poprz_sklad;
+
+                List <int> [] G = new List<int>[201];
+                for(int i=0; i< 201; i++)
+                {
+                    G[i] = new List<int>();
+                }
+            
+                Queue<int> Q = new Queue<int>();
+                int[] D = new int[201];
+
+
+                for (int i = 1; i <= v; i++)
+                    D[i] = INF;
+
+                for (int i = 0; i < v; i++)
+                {
+                    for (int j = i + 1; j < v; j++)
+                    {
+                        if (adjacencyMatrix.AdjacencyArray[i, j] == 1)
+                        {
+                            G[i+1].Add(j+1);
+                            G[j+1].Add(i+1);
+                        }
+                    }
+                }
+                max_sklad = ta_sklad = poprz_sklad = ile_skladowych = 0;
+                bfs(1, D, G, Q);
+
+                int ile_w_sklad = HowManyInOne(ta_sklad, poprz_sklad, v, D);
+                if (ile_w_sklad > max_sklad)
+                    max_sklad = ile_w_sklad;
+                poprz_sklad = ile_w_sklad;
+                ta_sklad = poprz_sklad;
+                ile_skladowych++;
+
+                for (int h = 1; h <= v; h++)
+                {
+                    if (D[h] == INF)
+                    {
+                        bfs(h, D, G, Q);
+                        ile_w_sklad = HowManyInOne(ta_sklad, poprz_sklad, v, D);
+                        if (ile_w_sklad > max_sklad)
+                            ile_w_sklad = ta_sklad;
+                        ile_skladowych++;
+                    }
+                }
+                Output.Text = max_sklad.ToString();
+                ile_skladowych = 0;
+
+                adjacencyMatrix.DrawGraph(num_of_v, MyCanvas);
+            }
+            else
+            {
+                Vertexes.Background = Brushes.OrangeRed;
+                Edges.Background = Brushes.OrangeRed;
+            }
+        }
+
+
+
+        public int HowManyInOne(int ta, int poprz, int n, int[] D)
+        {
+            const int INF = 207;
+            for (int l = 1; l <= n; l++)
+            {
+                if (D[l] != INF) //&& D[l]!=0
+                {
+                    ta++;
+                }
+            }
+            return ta - poprz;
+        }
+
+
+        void bfs(int p, int[] D, List<int>[] G, Queue<int> Q)
+        {
+            const int INF = 207;
+            D[p] = 0;
+            Q.Enqueue(p);
+            while (Q.Count != 0)
+            {
+                int x = Q.Peek();
+                Q.Dequeue();
+                for (int i = 0; i < G[x].Count; i++)
+                {
+                    int y = G[x][i];
+                    if (D[y] == INF)
+                    {
+                        D[y] = D[x] + 1;
+                        Q.Enqueue(y);
+                    }
+                }
+            }
+        }
+
+
+
+
     }
 }

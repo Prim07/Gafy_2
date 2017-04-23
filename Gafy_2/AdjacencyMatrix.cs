@@ -35,32 +35,48 @@ namespace Gafy_2
 
         public void Display(Canvas MyCanvas, int[] TabOfInt)
         {
+
             int max = TabOfInt.Length - 1;
-            AdjacencyArray[max, max] = 0;
-             for(int i=max; i>=0; i--)
+            for (int i = 0; i < max+1; i++)
+            {
+                for (int j = 0; j < max+1; j++)
+                {
+                    AdjacencyArray[i, j] = 0;
+                }
+            }
+            
+             for(int i=0; i<=max; i++)
              {
                 int value = TabOfInt[i];
                 if (value != 0)
                 {
-                    int j = 0;
                     for (int x = 1; x <= value; x++)
                     {
-                        bool done = false;
+                        int[] Tab = new int[max + 1];
+                        for (int k = 0; k <= max; k++)
+                        {
+                            Tab[k] = 0;
+                        }
+                        int j = FindMax(i, TabOfInt, Tab);
+                        Tab[j] = 1;
+                            bool done = false;
                         while (done == false)
                         {
                             if (AdjacencyArray[i,j] == 0 && i != j)
                             {
-                                AdjacencyArray[i, j] = 1;
-                                AdjacencyArray[j, i] = 1;
+                                AdjacencyArray[i,j] = 1;
+                                AdjacencyArray[j,i] = 1;
                                 TabOfInt[j]--;
                                 done = true;
                             }
                             else
                             {
-                                j++;
+                                j = FindMax(j, TabOfInt, Tab);
+                                Tab[j] = 1;
                             }
                         }
                     }
+                    TabOfInt[i] = 0;
                 }
                 
              }
@@ -71,48 +87,52 @@ namespace Gafy_2
             //randomizacja
             Random r = new Random();
             for(int i=0; i<50; i++) {
+
                 int x1 = r.Next(0, max);
                 int x2 = r.Next(0, max);
                 int y1 = r.Next(0, max);
                 int y2 = r.Next(0, max);
-                while (x1 == x2)
+                while (x1==x2 || y1==y2 || x1==y2 || x2==y1)
                 {
+                    x1 = r.Next(0, max);
                     x2 = r.Next(0, max);
-                }
-                while (y1 == y2)
-                {
+                    y1 = r.Next(0, max);
                     y2 = r.Next(0, max);
                 }
                 while (AdjacencyArray[x1, x2] == 0)
                 {
                     x1 = r.Next(0, max);
+                    while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
+                    {
+                        x1 = r.Next(0, max);
+                        x2 = r.Next(0, max);
+                        y1 = r.Next(0, max);
+                        y2 = r.Next(0, max);
+                    }
                 }
-                while (y1 == y2)
-                {
-                    y2 = r.Next(0, max);
-                }
-                while (x1 == y1 && x2 == y2)
+                while (AdjacencyArray[y1, y2] == 0)
                 {
                     y1 = r.Next(0, max);
-                    y2 = r.Next(0, max);
-                    while (y1 == y2)
+                    while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
                     {
-                        y2 = r.Next(0, max);
-                    }
-                    while (y1 == y2)
-                    {
+                        x1 = r.Next(0, max);
+                        x2 = r.Next(0, max);
+                        y1 = r.Next(0, max);
                         y2 = r.Next(0, max);
                     }
                 }
-                AdjacencyArray[x1, x2] = 0;
-                AdjacencyArray[x2, x1] = 0;
-                AdjacencyArray[y1, y2] = 0;
-                AdjacencyArray[y2, y1] = 0;
+                if (AdjacencyArray[x1, y2] == 0 && AdjacencyArray[y1, x2] == 0)
+                {
+                    AdjacencyArray[x1, x2] = 0;
+                    AdjacencyArray[x2, x1] = 0;
+                    AdjacencyArray[y1, y2] = 0;
+                    AdjacencyArray[y2, y1] = 0;
 
-                AdjacencyArray[x1, y2] = 1;
-                AdjacencyArray[y2, x1] = 1;
-                AdjacencyArray[y1, x2] = 1;
-                AdjacencyArray[x2, y1] = 1;
+                    AdjacencyArray[x1, y2] = 1;
+                    AdjacencyArray[y2, x1] = 1;
+                    AdjacencyArray[y1, x2] = 1;
+                    AdjacencyArray[x2, y1] = 1;
+                }
 
             }
 
@@ -121,11 +141,48 @@ namespace Gafy_2
             DrawGraph(AdjacencyArray.GetLength(0), MyCanvas);
         }
 
+        public int FindMax(int j, int[] Tab, int[] Tabb)
+        {
+            int max = Tab.Length-1;
+            int ret=-1;
+            if (max == 0)
+            {
+                ret = 0;
+            }
+            else
+            {
+                if (Tabb[0] == 0)
+                {
+                    for(int i=0; i<=max; i++)
+                    {
+                        if (ret == -1)
+                        {
+                            ret = 0;
+                        }
+                        else { if (Tab[i] > Tab[ret] && Tabb[i] == 0) ret = i; };
+                    }
+                }
+                else
+                {
+                    for (int i = 1; i <= max; i++)
+                    {
+                        if (ret == -1)
+                        {
+                            ret = 1;
+                        }
+                        else { if (Tab[i] > Tab[ret] && Tabb[i] == 0) ret = i; };
+                    }
+                }
+
+            }
+            return ret;
+        }
 
 
 
 
-        private void DrawGraph(int num_v, Canvas MyCanvas)
+
+        public void DrawGraph(int num_v, Canvas MyCanvas)
         {
             MyCanvas.Children.Clear();
 
@@ -198,6 +255,8 @@ namespace Gafy_2
 
             }
         }
+
+
 
     }
 }
