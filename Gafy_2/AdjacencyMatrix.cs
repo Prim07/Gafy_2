@@ -86,39 +86,39 @@ namespace Gafy_2
 
             //randomizacja
             Random r = new Random();
-            for(int i=0; i<50; i++) {
+            for(int i=0; i<10; i++) {
 
-                int x1 = r.Next(0, max);
-                int x2 = r.Next(0, max);
-                int y1 = r.Next(0, max);
-                int y2 = r.Next(0, max);
+                int x1 = r.Next(0, max + 1);
+                int x2 = r.Next(0, max + 1);
+                int y1 = r.Next(0, max + 1);
+                int y2 = r.Next(0, max + 1);
                 while (x1==x2 || y1==y2 || x1==y2 || x2==y1)
                 {
-                    x1 = r.Next(0, max);
-                    x2 = r.Next(0, max);
-                    y1 = r.Next(0, max);
-                    y2 = r.Next(0, max);
+                    x1 = r.Next(0, max + 1);
+                    x2 = r.Next(0, max + 1);
+                    y1 = r.Next(0, max + 1);
+                    y2 = r.Next(0, max + 1);
                 }
                 while (AdjacencyArray[x1, x2] == 0)
                 {
-                    x1 = r.Next(0, max);
+                    x1 = r.Next(0, max + 1);
                     while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
                     {
-                        x1 = r.Next(0, max);
-                        x2 = r.Next(0, max);
-                        y1 = r.Next(0, max);
-                        y2 = r.Next(0, max);
+                        x1 = r.Next(0, max + 1);
+                        x2 = r.Next(0, max + 1);
+                        y1 = r.Next(0, max + 1);
+                        y2 = r.Next(0, max + 1);
                     }
                 }
                 while (AdjacencyArray[y1, y2] == 0)
                 {
-                    y1 = r.Next(0, max);
+                    y1 = r.Next(0, max + 1);
                     while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
                     {
-                        x1 = r.Next(0, max);
-                        x2 = r.Next(0, max);
-                        y1 = r.Next(0, max);
-                        y2 = r.Next(0, max);
+                        x1 = r.Next(0, max + 1);
+                        x2 = r.Next(0, max + 1);
+                        y1 = r.Next(0, max + 1);
+                        y2 = r.Next(0, max + 1);
                     }
                 }
                 if (AdjacencyArray[x1, y2] == 0 && AdjacencyArray[y1, x2] == 0)
