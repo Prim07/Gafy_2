@@ -12,12 +12,13 @@ namespace Gafy_2
     class AdjacencyMatrix
     {
 
-
+        //nasza macierz :)
         public int[,] AdjacencyArray;
 
         
 
      
+        //zerujemy na poczatek
         public AdjacencyMatrix(int n)
         {
             AdjacencyArray = new int[n, n];
@@ -32,7 +33,8 @@ namespace Gafy_2
 
 
 
-
+        //rysujemy zranomizowany graf - nawet nie starajcie sie tego zrozumiec
+        //dluuugo to naprawialam i sama nie jestem pewna jak, ale dziala
         public void Display(Canvas MyCanvas, int[] TabOfInt)
         {
 
@@ -85,13 +87,14 @@ namespace Gafy_2
 
 
             //randomizacja
+            //wubieramy 4 wierzcholki
             Random r = new Random();
             for(int i=0; i<10; i++) {
-
                 int x1 = r.Next(0, max + 1);
                 int x2 = r.Next(0, max + 1);
                 int y1 = r.Next(0, max + 1);
                 int y2 = r.Next(0, max + 1);
+                //sprawdzamy czy to sa dwie istniejace krawiedzie
                 while (x1==x2 || y1==y2 || x1==y2 || x2==y1)
                 {
                     x1 = r.Next(0, max + 1);
@@ -121,6 +124,7 @@ namespace Gafy_2
                         y2 = r.Next(0, max + 1);
                     }
                 }
+                //jesli nie nadpisujemy istniejacych krawiedzi to nastepuje zamiana
                 if (AdjacencyArray[x1, y2] == 0 && AdjacencyArray[y1, x2] == 0)
                 {
                     AdjacencyArray[x1, x2] = 0;
@@ -141,6 +145,7 @@ namespace Gafy_2
             DrawGraph(AdjacencyArray.GetLength(0), MyCanvas);
         }
 
+        //potrzebne do trzenia macierzy - nie probujcie zrozumiec
         public int FindMax(int j, int[] Tab, int[] Tabb)
         {
             int max = Tab.Length-1;
@@ -182,6 +187,7 @@ namespace Gafy_2
 
 
 
+        //rysowanie skopiowane z zestawu 1
         public void DrawGraph(int num_v, Canvas MyCanvas)
         {
             MyCanvas.Children.Clear();

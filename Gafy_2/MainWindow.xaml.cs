@@ -110,6 +110,7 @@ namespace Gafy_2
         //Tutaj rysujemy graf losowy o zadanych stopniach wierzcholkow
         private void Button_Click1(object sender, RoutedEventArgs e)
         {
+            //prawie to samo co wyżej
             if (Dagrees.Text != "0")
             {
                 Dagrees.Background = Brushes.White;
@@ -117,6 +118,7 @@ namespace Gafy_2
                 string[] SeparetedFromTheBox = FromTheBox.Split(',');
                 int[] TabOfInt = Array.ConvertAll(SeparetedFromTheBox, i => int.Parse(i));
                 Array.Sort(TabOfInt);
+                //towrzymy sobie macierz i rysujemy graf
                 AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(TabOfInt.Length);
                 adjacencyMatrix.Display(MyCanvas, TabOfInt);
             }
@@ -130,9 +132,10 @@ namespace Gafy_2
 
 
 
-        //Tutaj rysujemy graf losowy o zadanych stopniach wierzcholkow
+        //Rysujemy graf i szukamy w nim największej wspólnej składowej
         private void Button_Click2(object sender, RoutedEventArgs e)
         {
+            //ta czesc jest skopiowana z zestawu 1
             if (Vertexes.Text == "")
             {
                 Vertexes.Background = Brushes.OrangeRed;
@@ -178,7 +181,7 @@ namespace Gafy_2
 
                 }
 
-                //sprawdzanie!!!!!!
+                //sprawdzanie od Tomka NWS
                 //////////////////////////////
 
                 int v = num_of_v;
@@ -245,6 +248,7 @@ namespace Gafy_2
 
 
 
+        //do NWS
         public int HowManyInOne(int ta, int poprz, int n, int[] D)
         {
             const int INF = 207;
@@ -258,7 +262,9 @@ namespace Gafy_2
             return ta - poprz;
         }
 
-
+        
+        
+        //do NWS
         void bfs(int p, int[] D, List<int>[] G, Queue<int> Q)
         {
             const int INF = 207;
