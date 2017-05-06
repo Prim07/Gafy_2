@@ -93,9 +93,9 @@ namespace Gafy_2
                 //wyswietlamy odpowiedni komunikat w miejscu, gdzie byl ciag
                 string OutPut;
                 if (TrueOrFalse == true)
-                    OutPut = "Tak";
+                    OutPut = "Tak.";
                 else
-                    OutPut = "Nie";
+                    OutPut = "Nie.";
                 Sequence.Text = OutPut;
             }
             else
@@ -120,7 +120,7 @@ namespace Gafy_2
                 Array.Sort(TabOfInt);
                 //towrzymy sobie macierz i rysujemy graf
                 AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(TabOfInt.Length);
-                adjacencyMatrix.Display(MyCanvas, TabOfInt);
+                adjacencyMatrix.Display(MyCanvas, TabOfInt, true);
             }
             else
             {
@@ -145,7 +145,7 @@ namespace Gafy_2
                 Vertexes.Background = Brushes.White;
                 Edges.Background = Brushes.OrangeRed;
             }
-            else if ((Int32.Parse(Edges.Text) * Int32.Parse(Edges.Text) - Int32.Parse(Edges.Text)) / 2 <= Int32.Parse(Vertexes.Text))
+            else if ((Int32.Parse(Vertexes.Text) * Int32.Parse(Vertexes.Text) - Int32.Parse(Vertexes.Text)) / 2 >= Int32.Parse(Edges.Text))
             {
                 Vertexes.Background = Brushes.White;
                 Edges.Background = Brushes.White;
@@ -181,63 +181,90 @@ namespace Gafy_2
 
                 }
 
-                //sprawdzanie od Tomka NWS
-                //////////////////////////////
+                adjacencyMatrix.DrawGraph(num_of_v, MyCanvas);
 
+
+
+                //sprawdzanie NSS
+                
                 int v = num_of_v;
-
-                const int INF = 207;
-                int n, m, a, b, ile_skladowych, max_sklad, ta_sklad, poprz_sklad;
-
-                List <int> [] G = new List<int>[201];
-                for(int i=0; i< 201; i++)
+                
+                Stack<int> stos = new Stack<int>();
+                int cn = 0;
+                int[] c = new int[v];
+                for(int i=0; i<v; i++)
                 {
-                    G[i] = new List<int>();
+                    c[i] = 0;
                 }
-            
-                Queue<int> Q = new Queue<int>();
-                int[] D = new int[201];
-
-
-                for (int i = 1; i <= v; i++)
-                    D[i] = INF;
-
                 for (int i = 0; i < v; i++)
                 {
-                    for (int j = i + 1; j < v; j++)
+                    if (c[i] > 0)
                     {
-                        if (adjacencyMatrix.AdjacencyArray[i, j] == 1)
+                        continue;
+                    }
+                    cn++;
+                    stos.Push(i);
+                    c[i] = cn;
+                    while (stos.Count > 0)
+                    {
+                        int vv = stos.Pop();
+                        List<int> neighbours = new List<int>();
+                        for(int j=0; j<v; j++)
                         {
-                            G[i+1].Add(j+1);
-                            G[j+1].Add(i+1);
+                            if( adjacencyMatrix.AdjacencyArray[vv, j] == 1)
+                            {
+                                neighbours.Add(j);
+                            }
                         }
+                        for (int j = 0; j < neighbours.Count; j++)
+                        {
+                            if (c[neighbours[j]] > 0)
+                            {
+                                continue;
+                            }
+                            stos.Push(neighbours[j]);
+                            c[neighbours[j]] = cn;
+                        }
+
+
+
+
                     }
+
+
+                    if (c.Count(x => x == cn) == v)
+                        break;
                 }
-                max_sklad = ta_sklad = poprz_sklad = ile_skladowych = 0;
-                bfs(1, D, G, Q);
 
-                int ile_w_sklad = HowManyInOne(ta_sklad, poprz_sklad, v, D);
-                if (ile_w_sklad > max_sklad)
-                    max_sklad = ile_w_sklad;
-                poprz_sklad = ile_w_sklad;
-                ta_sklad = poprz_sklad;
-                ile_skladowych++;
-
-                for (int h = 1; h <= v; h++)
+                int max = 0, maxval = 0;
+                for( int i=1; i<=cn; i++)
                 {
-                    if (D[h] == INF)
+                    if (c.Count(x => x == i) > max)
                     {
-                        bfs(h, D, G, Q);
-                        ile_w_sklad = HowManyInOne(ta_sklad, poprz_sklad, v, D);
-                        if (ile_w_sklad > max_sklad)
-                            ile_w_sklad = ta_sklad;
-                        ile_skladowych++;
+                        max = c.Count(x => x == i);
+                        maxval = i;
                     }
                 }
-                Output.Text = max_sklad.ToString();
-                ile_skladowych = 0;
 
-                adjacencyMatrix.DrawGraph(num_of_v, MyCanvas);
+                string ciag = "";
+                int ile = 0;
+                for (int i = 0; i < v; i++)
+                {
+                    if (c[i] == maxval)
+                    {
+                        ciag += (i+1).ToString() + ", ";
+                        ile++;
+                    }
+                }
+                string nowyciag = " ";
+                for(int i=0; i<ciag.Length-5; i++)
+                {
+                    nowyciag += ciag[i];
+                }
+
+                string wypisz = "NSS zawiera: " + nowyciag + ".";
+                Output.Text = wypisz;
+
             }
             else
             {
@@ -246,46 +273,174 @@ namespace Gafy_2
             }
         }
 
-
-
-        //do NWS
-        public int HowManyInOne(int ta, int poprz, int n, int[] D)
-        {
-            const int INF = 207;
-            for (int l = 1; l <= n; l++)
-            {
-                if (D[l] != INF) //&& D[l]!=0
-                {
-                    ta++;
-                }
-            }
-            return ta - poprz;
-        }
-
         
-        
-        //do NWS
-        void bfs(int p, int[] D, List<int>[] G, Queue<int> Q)
+      
+
+
+        //budujemy graf eulerowski i znajdujemy cykl
+        private void Button_Click3(object sender, RoutedEventArgs e)
         {
-            const int INF = 207;
-            D[p] = 0;
-            Q.Enqueue(p);
-            while (Q.Count != 0)
+            //budujemy
+            if (Veuler.Text != "0")
             {
-                int x = Q.Peek();
-                Q.Dequeue();
-                for (int i = 0; i < G[x].Count; i++)
+                Veuler.Background = Brushes.White;
+                var num_of_v = Int32.Parse(Veuler.Text);
+                AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(num_of_v);
+                adjacencyMatrix.Display(MyCanvas, num_of_v);
+
+                //cykl
+                Stack stos = new Stack();
+                Random r = new Random();int v = r.Next(0, num_of_v);
+                int[,] byc = new int[num_of_v, num_of_v];
+                for (int i = 0; i < num_of_v; i++)
                 {
-                    int y = G[x][i];
-                    if (D[y] == INF)
+                    for (int j = 0; j < num_of_v; j++)
                     {
-                        D[y] = D[x] + 1;
-                        Q.Enqueue(y);
+                        byc[i, j] = 0;
                     }
                 }
+                Euler(v, stos, num_of_v, adjacencyMatrix.AdjacencyArray, byc);
+                
+                //wypisz na ekran
+                object[] tab = stos.ToArray();
+                string wypisz = "";
+                for(int i=0; i<tab.Length; i++)
+                {
+                    wypisz = wypisz + tab[i].ToString() + ", ";
+                }
+                wypisz = wypisz + tab[0].ToString() + ".";
+                Output1.Text = wypisz;
+            }
+            else
+            {
+                Veuler.Background = Brushes.OrangeRed;
+            }
+
+            
+        }
+        
+        //znajdowanie cyklu eulera
+        public void Euler(int v, Stack stos, int num_of_v, int[,] AdjacencyArray, int[,] byc)
+        {
+           
+            int dev = 0;
+            for (int i = 0; i < num_of_v; i++)
+            {
+                if (AdjacencyArray[v, i] == 1)
+                {
+                    dev++;
+                }
+            }
+            if( dev!= 0)
+            {
+                int u = -1;
+                for (int i = 0; i < num_of_v; i++)
+                {
+                    if (AdjacencyArray[v, i] == 1)
+                    {
+                        u = i;
+                    }
+                }
+                AdjacencyArray[v, u] = 0;
+                AdjacencyArray[u, v] = 0;
+                if (byc[v, u] == 0)
+                {
+                    byc[v, u] = 1;
+                    byc[u, v] = 1;
+                    Euler(u, stos, num_of_v, AdjacencyArray, byc);
+                    stos.Push(u + 1);
+                 
+                }
+
             }
         }
 
+
+        private void Button_Click4(object sender, RoutedEventArgs e)
+        {
+           var v = Int32.Parse(Ver.Text);
+            var k = Int32.Parse(kkk.Text);
+            int[] TabOfInt = new int[v];
+            for (int i = 0; i < v; i++)
+            {
+                TabOfInt[i] = (int)k;
+            }
+
+
+            //Ta zmienna mówi nam czy ciąg jest grafuiczny czy nie jest
+            bool TrueOrFalse = false;
+            //znacznik konca petli
+            bool EndLoop = false;
+            //idneks ostatniego elementu tablicy
+            int max = TabOfInt.Length - 1;
+
+            //tu się dzieja rzeczy
+            while (EndLoop == false)
+            {
+                //bierzemy ostani element i sprawdzamy czy nie jest on za duzy jak np. w ciagu 1,2,8 
+                //bo wtedy nie mozemy go odjac i z miejsca taki ciag nie jest graficzny
+                Array.Sort(TabOfInt);
+                int value = TabOfInt[max];
+                if (value > max)
+                {
+                    TrueOrFalse = false;
+                    EndLoop = true;
+                }
+                //jesli sie zgadza wszytko to po kolei odejmujemy i ustawiamy value na 0
+                else
+                {
+                    for (int i = max - 1; i >= max - value; i--)
+                    {
+                        TabOfInt[i]--;
+                    }
+                    TabOfInt[max] = 0;
+                    //sortowanie
+                    Array.Sort(TabOfInt);
+                    //jesli ostatnia, czyli najwieksza liczba, to 0, to znaczy ze jest koniec
+                    //tutaj zaznaczamy EndLoop na true (konczymy petle)
+                    //zakladamy tez ze mamy same 0 - wtedy ciag jest graficzny - czyli TrueOrFalse = true
+                    //potem w petli for sprawdzamy czy nie mamy jakiego (-1) - ciag nie jest graficzny
+                    if (TabOfInt[max] == 0)
+                    {
+                        EndLoop = true;
+                        TrueOrFalse = true;
+                        for (int i = 0; i <= max; i++)
+                        {
+                            if (TabOfInt[i] < 0) TrueOrFalse = false;
+                        }
+                    }
+                }
+
+            }
+
+            //wyswietlamy odpowiedni komunikat w miejscu, gdzie byl ciag
+            if (TrueOrFalse == true)
+            {
+                kkk.Background = Brushes.White;
+                Ver.Background = Brushes.White;
+
+                for (int i = 0; i < v; i++)
+                {
+                    TabOfInt[i] = (int)k;
+                }
+
+                AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(TabOfInt.Length);
+                adjacencyMatrix.Display(MyCanvas, TabOfInt, true);
+
+
+            }
+              
+
+            else
+            {
+                kkk.Background = Brushes.OrangeRed;
+                Ver.Background = Brushes.OrangeRed;
+            }
+           
+
+     
+        }
+            
 
 
 

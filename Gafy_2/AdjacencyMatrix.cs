@@ -35,7 +35,7 @@ namespace Gafy_2
 
         //rysujemy zranomizowany graf - nawet nie starajcie sie tego zrozumiec
         //dluuugo to naprawialam i sama nie jestem pewna jak, ale dziala
-        public void Display(Canvas MyCanvas, int[] TabOfInt)
+        public void Display(Canvas MyCanvas, int[] TabOfInt, bool randomm)
         {
 
             int max = TabOfInt.Length - 1;
@@ -84,27 +84,18 @@ namespace Gafy_2
              }
 
 
-
-
-            //randomizacja
-            //wubieramy 4 wierzcholki
-            Random r = new Random();
-            for(int i=0; i<10; i++) {
-                int x1 = r.Next(0, max + 1);
-                int x2 = r.Next(0, max + 1);
-                int y1 = r.Next(0, max + 1);
-                int y2 = r.Next(0, max + 1);
-                //sprawdzamy czy to sa dwie istniejace krawiedzie
-                while (x1==x2 || y1==y2 || x1==y2 || x2==y1)
+             if(randomm)
+            {
+                //randomizacja
+                //wubieramy 4 wierzcholki
+                Random r = new Random();
+                for (int i = 0; i < 10; i++)
                 {
-                    x1 = r.Next(0, max + 1);
-                    x2 = r.Next(0, max + 1);
-                    y1 = r.Next(0, max + 1);
-                    y2 = r.Next(0, max + 1);
-                }
-                while (AdjacencyArray[x1, x2] == 0)
-                {
-                    x1 = r.Next(0, max + 1);
+                    int x1 = r.Next(0, max + 1);
+                    int x2 = r.Next(0, max + 1);
+                    int y1 = r.Next(0, max + 1);
+                    int y2 = r.Next(0, max + 1);
+                    //sprawdzamy czy to sa dwie istniejace krawiedzie
                     while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
                     {
                         x1 = r.Next(0, max + 1);
@@ -112,33 +103,47 @@ namespace Gafy_2
                         y1 = r.Next(0, max + 1);
                         y2 = r.Next(0, max + 1);
                     }
-                }
-                while (AdjacencyArray[y1, y2] == 0)
-                {
-                    y1 = r.Next(0, max + 1);
-                    while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
+                    while (AdjacencyArray[x1, x2] == 0)
                     {
                         x1 = r.Next(0, max + 1);
-                        x2 = r.Next(0, max + 1);
-                        y1 = r.Next(0, max + 1);
-                        y2 = r.Next(0, max + 1);
+                        while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
+                        {
+                            x1 = r.Next(0, max + 1);
+                            x2 = r.Next(0, max + 1);
+                            y1 = r.Next(0, max + 1);
+                            y2 = r.Next(0, max + 1);
+                        }
                     }
-                }
-                //jesli nie nadpisujemy istniejacych krawiedzi to nastepuje zamiana
-                if (AdjacencyArray[x1, y2] == 0 && AdjacencyArray[y1, x2] == 0)
-                {
-                    AdjacencyArray[x1, x2] = 0;
-                    AdjacencyArray[x2, x1] = 0;
-                    AdjacencyArray[y1, y2] = 0;
-                    AdjacencyArray[y2, y1] = 0;
+                    while (AdjacencyArray[y1, y2] == 0)
+                    {
+                        y1 = r.Next(0, max + 1);
+                        while (x1 == x2 || y1 == y2 || x1 == y2 || x2 == y1)
+                        {
+                           // x1 = r.Next(0, max + 1);
+                           // x2 = r.Next(0, max + 1);
+                            y1 = r.Next(0, max + 1);
+                            y2 = r.Next(0, max + 1);
+                        }
+                    }
+                    //jesli nie nadpisujemy istniejacych krawiedzi to nastepuje zamiana
+                    if (AdjacencyArray[x1, y2] == 0 && AdjacencyArray[y1, x2] == 0)
+                    {
+                        AdjacencyArray[x1, x2] = 0;
+                        AdjacencyArray[x2, x1] = 0;
+                        AdjacencyArray[y1, y2] = 0;
+                        AdjacencyArray[y2, y1] = 0;
 
-                    AdjacencyArray[x1, y2] = 1;
-                    AdjacencyArray[y2, x1] = 1;
-                    AdjacencyArray[y1, x2] = 1;
-                    AdjacencyArray[x2, y1] = 1;
-                }
+                        AdjacencyArray[x1, y2] = 1;
+                        AdjacencyArray[y2, x1] = 1;
+                        AdjacencyArray[y1, x2] = 1;
+                        AdjacencyArray[x2, y1] = 1;
+                    }
 
+                }
             }
+
+
+            
 
 
             //wyswietlanie
@@ -261,6 +266,67 @@ namespace Gafy_2
 
             }
         }
+
+        //budujemy graf eulerowski o zadanej liczbie krawedzi
+        public void Display(Canvas MyCanvas, int v)
+        {
+            //cykl eulera
+            int[] done = new int[v];
+            for(int i=0; i<v; i++)
+            {
+                done[i] = 0;
+            }
+            int ile = 1;
+            Random r = new Random();
+            int aktualny = r.Next(0, v);
+            int pierwszy = aktualny;
+            done[aktualny] = 1;
+            int nowy;
+            while (ile != v)
+            {
+                nowy = r.Next(0, v);
+                while(nowy != aktualny && done[nowy] == 0)
+                {
+                    AdjacencyArray[nowy, aktualny] = 1;
+                    AdjacencyArray[aktualny, nowy] = 1;
+                    aktualny = nowy;
+                    ile++;
+                    done[nowy] = 1;
+
+                }
+
+            }
+            AdjacencyArray[pierwszy, aktualny] = 1;
+            AdjacencyArray[aktualny, pierwszy] = 1;
+
+            //dodajemy kolejne krawedzie
+            /*double ilemax = v * (v - 1) / 2;
+            double p = r.Next(35, 81);
+            double ilemabyc = ilemax * p / (double)100.0;
+            int iledodac = (int)ilemabyc - v;
+            if( iledodac > 0)
+            {
+                ile = 0;
+                while (ile != iledodac)
+                {
+                    aktualny = r.Next(0, v);
+                    nowy = r.Next(0, v);
+                    while (nowy != aktualny && AdjacencyArray[nowy, aktualny] == 0)
+                    {
+                        AdjacencyArray[nowy, aktualny] = 1;
+                        AdjacencyArray[aktualny, nowy] = 1;
+                        ile++;
+                    }
+                }
+            }*/
+
+
+            //wyswietlanie
+            DrawGraph(AdjacencyArray.GetLength(0), MyCanvas);
+        }
+
+
+        
 
 
 
