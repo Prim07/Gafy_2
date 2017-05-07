@@ -35,7 +35,7 @@ namespace Gafy_2
 
         //rysujemy zranomizowany graf - nawet nie starajcie sie tego zrozumiec
         //dluuugo to naprawialam i sama nie jestem pewna jak, ale dziala
-        public void Display(Canvas MyCanvas, int[] TabOfInt, bool randomm)
+        public void Display(Canvas MyCanvas, int[] TabOfInt, bool randomm, bool draw)
         {
 
             int max = TabOfInt.Length - 1;
@@ -143,10 +143,10 @@ namespace Gafy_2
             }
 
 
-            
 
 
             //wyswietlanie
+            if (draw)
             DrawGraph(AdjacencyArray.GetLength(0), MyCanvas);
         }
 
@@ -267,7 +267,7 @@ namespace Gafy_2
             }
         }
 
-        //budujemy graf eulerowski o zadanej liczbie krawedzi
+        //budujemy graf hamiltonowski o zadanej liczbie krawedzi
         public void Display(Canvas MyCanvas, int v)
         {
             //cykl eulera
@@ -300,7 +300,7 @@ namespace Gafy_2
             AdjacencyArray[aktualny, pierwszy] = 1;
 
             //dodajemy kolejne krawedzie
-            /*double ilemax = v * (v - 1) / 2;
+            double ilemax = v * (v - 1) / 2;
             double p = r.Next(35, 81);
             double ilemabyc = ilemax * p / (double)100.0;
             int iledodac = (int)ilemabyc - v;
@@ -318,7 +318,7 @@ namespace Gafy_2
                         ile++;
                     }
                 }
-            }*/
+            }
 
 
             //wyswietlanie
